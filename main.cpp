@@ -10,6 +10,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "SOIL2/SOIL2.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.hpp"
 
@@ -49,89 +52,113 @@ int main(int argc, const char * argv[]) {
     
     glViewport(0, 0, screenWidth, screenHeight);
     
+    glEnable(GL_DEPTH_TEST);
+    
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-   /* GLuint vertexShader = glCreateShader (GL_VERTEX_SHADER);
-    glShaderSource (vertexShader,1,&vertexShaderSource,NULL);
-    glCompileShader (vertexShader);
+   Shader ourShader ("resources/shader/core.vs","resources/shader/core.frag");
     
-    GLint succes;
-    GLchar infoLog[512];
-    
-    glGetShaderiv (vertexShader, GL_COMPILE_STATUS, &succes);
-    
-    if (!succes)
-    {
-        glGetShaderInfoLog (vertexShader,512,NULL,infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<infoLog <<std::endl;
-    }
-    
-    GLuint fragmentShader = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fragmentShader,1,&fragmentShaderSource,NULL);
-    glCompileShader (fragmentShader);
-    
-    glGetShaderiv (fragmentShader, GL_COMPILE_STATUS,&succes);
-    
-    if (!succes)
-    {
-        glGetShaderInfoLog (fragmentShader,512,NULL,infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" <<infoLog <<std::endl;
-    }
-    
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader (shaderProgram, vertexShader);
-    glAttachShader (shaderProgram,fragmentShader);
-    glLinkProgram (shaderProgram);
-    
-    glGetProgramiv (shaderProgram,GL_LINK_STATUS,&succes);
-    
-    
-    if (!succes)
-    {
-        glGetProgramInfoLog (shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" <<infoLog <<std::endl;
-    }
-    
-    glDeleteShader (vertexShader);
-    glDeleteShader (fragmentShader);*/
-    Shader ourShader ("resources/shader/core.vs","resources/shader/core.frag");
-    
-    GLfloat vertices[] =
-    {
-        //position                  //color                 // texture coordinates
-        0.5f, 0.5f, 0.0,              1.0f,0.0f,0.0f,        0.0f,0.0f, //0
-        0.5f, -0.5f, 0.0,             1.0f,1.0f,1.0f,        0.0f,1.0f, //1
-        -0.5f,-0.5f, 0.0,             1.0f,0.0f,0.0f,        1.0f,1.0f, //2
-        -0.5f,0.5f, 0.0,              1.0f,0.0f,1.0f,        1.0f,0.0f  //3
+    GLfloat vertices[] = {
+        /*-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f*/
+        
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 0.0f,
+        0.5f * 500, -0.5f * 500, -0.5f * 500,  1.0f, 0.0f,
+        0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        -0.5f * 500,  0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 0.0f,
+        
+        -0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        0.5f * 500, -0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 1.0f,
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 1.0f,
+        -0.5f * 500,  0.5f * 500,  0.5f * 500,  0.0f, 1.0f,
+        -0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        
+        -0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        -0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        -0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        -0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        0.5f * 500, -0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        0.5f * 500, -0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        0.5f * 500, -0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        -0.5f * 500, -0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        -0.5f * 500, -0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        
+        -0.5f * 500,  0.5f * 500, -0.5f * 500,  0.0f, 1.0f,
+        0.5f * 500,  0.5f * 500, -0.5f * 500,  1.0f, 1.0f,
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        0.5f * 500,  0.5f * 500,  0.5f * 500,  1.0f, 0.0f,
+        -0.5f * 500,  0.5f * 500,  0.5f * 500,  0.0f, 0.0f,
+        -0.5f * 500,  0.5f * 500, -0.5f * 500,  0.0f, 1.0f
+        
     };
-    
-    GLuint indices[] =
-    {
-        0,1,3,  // first triangle
-        1,2,3   // second
-    };
-    
-    GLuint VBO, VAO, EBO;
+  
+    GLuint VBO, VAO;
     glGenVertexArrays (1, &VAO);
     glGenBuffers (1, &VBO);
-    glGenBuffers (1, &EBO);
     
     glBindVertexArray (VAO);
     glBindBuffer (GL_ARRAY_BUFFER,VBO);
     glBufferData (GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
-    glBindBuffer (GL_ELEMENT_ARRAY_BUFFER,EBO);
-    glBufferData (GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer (0,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),(GLvoid *)0);
+    glVertexAttribPointer (0,3,GL_FLOAT,GL_FALSE,5 * sizeof(GLfloat),(GLvoid *)0);
     glEnableVertexAttribArray (0);
     
-    //color atribute
-    glVertexAttribPointer (1,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),(GLvoid *)(3*sizeof(GLfloat)));
-    glEnableVertexAttribArray (1);
     // texture coordinates attribute
-    glVertexAttribPointer (2,2,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),(GLvoid *)(6*sizeof(GLfloat)));
+    glVertexAttribPointer (2,2,GL_FLOAT,GL_FALSE,5 * sizeof(GLfloat),(GLvoid *)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray (2);
     
     glBindBuffer (GL_ARRAY_BUFFER,0);
@@ -155,30 +182,48 @@ int main(int argc, const char * argv[]) {
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0);
     
+    glm::mat4 projection;
+    //projection = glm::perspective(45.0f, (GLfloat)screenWidth / (GLfloat)screenHeight, 0.1f, 1000.0f);
+    
+    projection = glm::ortho(0.0f, (GLfloat) screenWidth, 0.0f, (GLfloat)screenHeight, 0.1f, 1000.0f);
+    
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-       // glUseProgram (shaderProgram);
-        ourShader.Use();
-        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       
         glActiveTexture (GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i (glGetUniformLocation (ourShader.Program, "ourTexture"),0);
         
+       // glUseProgram (shaderProgram);
+        ourShader.Use();
+        
+        glm::mat4 model;
+        glm::mat4 view;
+        //model =  glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3 (0.5f,1.0f,0.0f));
+        //view = glm::translate(view, glm::vec3 (0.0f,0.0f, -3.0f));
+       
+        model = glm::rotate(model, 0.5f, glm::vec3 (1.0f,0.0f ,0.0f));
+        view = glm::translate(view, glm::vec3 (screenWidth/2, screenHeight/2, -700.0f));
+        
+        GLint modelLoc = glGetUniformLocation (ourShader.Program, "model");
+        GLint viewLoc = glGetUniformLocation (ourShader.Program, "view");
+        GLint preojectionLoc = glGetUniformLocation (ourShader.Program, "projection");
+
+        glUniformMatrix4fv (modelLoc,1,GL_FALSE,glm::value_ptr(model));
+        glUniformMatrix4fv (viewLoc,1,GL_FALSE,glm::value_ptr(view));
+        glUniformMatrix4fv (preojectionLoc,1,GL_FALSE,glm::value_ptr(projection));
         
         glBindVertexArray (VAO);
-       // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray (0);
         
         glfwSwapBuffers(window);
     }
     glDeleteVertexArrays (1, &VAO);
     glDeleteBuffers (1,&VBO);
-    glDeleteBuffers (1,&EBO);
     
     glfwTerminate();
     return EXIT_SUCCESS;
